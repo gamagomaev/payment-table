@@ -1,14 +1,46 @@
 <form class="form" [formGroup]="form" (ngSubmit)="onSubmit()">
-  <input-field
-    *ngFor="let inputData of inputsFieldsData"
-    [formControlName]="inputData.controlName"
-    [data]="inputData"
-    (submitData)="setFormValue($event, inputData.controlName)"
-  ></input-field>
-  <button-comp
-    [name]="'Добавить'"
-    [disabled]="form.invalid || form.disabled"
-  ></button-comp>
+  <div class="field-wrapper">
+    <input
+      type="text"
+      formControlName="paymentName"
+      placeholder="Наименование платежа"
+      [ngClass]="{
+        invalid:
+          form.controls.paymentName.dirty && form.controls.paymentName.errors
+      }"
+    />
+    <div
+      class="error-message"
+      *ngIf="
+        form.controls.paymentName.dirty && form.controls.paymentName.errors
+      "
+    >
+      <span>
+        {{ getErrorMessage(form.controls.paymentName.errors) }}
+      </span>
+    </div>
+  </div>
+  <div class="field-wrapper">
+    <input
+      type="text"
+      formControlName="costPerDay"
+      placeholder="Стоимость за день"
+      [ngClass]="{
+        invalid:
+          form.controls.costPerDay.dirty && form.controls.costPerDay.errors
+      }"
+    />
+
+    <div
+      class="error-message"
+      *ngIf="form.controls.costPerDay.dirty && form.controls.costPerDay.errors"
+    >
+      <span>
+        {{ getErrorMessage(form.controls.costPerDay.errors) }}
+      </span>
+    </div>
+  </div>
+  <button-comp [name]="'Добавить'" [disabled]="form.invalid"></button-comp>
 </form>
 
 <div class="table">
@@ -23,7 +55,7 @@
 
   <div class="table__items">
     <ng-container *ngIf="payments.length > 0">
-      <ng-container *ngFor="let payment of payments">
+      <ng-container *ngFor="let payment of payments; let i = index">
         <div class="payment columns_style">
           <div class="name" title="{{ payment.paymentName }}">
             {{ payment.paymentName }}
@@ -36,10 +68,10 @@
               <input
                 type="checkbox"
                 (change)="
-                  checkPaymentMonth(
-                    $event,
+                  getSumOfMonthlyPayment(
+                    $event.target.checked,
                     month.daysNumber,
-                    payment.id,
+                    i,
                     payment.costPerDay
                   )
                 "
@@ -52,7 +84,7 @@
               inline="true"
               aria-hidden="false"
               aria-label="Example home icon"
-              (click)="deletePayment(payment.id)"
+              (click)="deletePayment(i)"
               >close</mat-icon
             >
           </div>

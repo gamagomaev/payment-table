@@ -1,4 +1,3 @@
-import { InputFieldComponent } from './components/controls/input-field/input-field.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
@@ -9,12 +8,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ButtonComponent } from './components/controls/button/button.component';
 import { MatIconModule } from '@angular/material/icon';
 @NgModule({
-  declarations: [
-    AppComponent,
-    PaymentTableComponent,
-    InputFieldComponent,
-    ButtonComponent,
-  ],
+  declarations: [AppComponent, PaymentTableComponent, ButtonComponent],
   imports: [
     BrowserModule,
     MatSliderModule,

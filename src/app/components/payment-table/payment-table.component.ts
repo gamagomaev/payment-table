@@ -1,27 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, Validators } from '@angular/forms';
-import { IInputFieldData } from '../../models/interfaces/input-field-data.interface';
-import { Utils } from '../../helpers/utils';
-import { CustomValidators } from '../controls/input-field/validators/validators';
-import * as moment from 'moment';
-
-interface IMonthPayment {
-  id: number;
-  name: string;
-  daysNumber: number;
-  checked: boolean;
-}
-
-interface IPayment {
-  id: number;
-  paymentName: string;
-  costPerDay: number;
-  checked: boolean;
-}
-
-interface ICheckedPayments {
-  [key: string]: number;
-}
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { TInputErrorName } from 'src/app/models/types/input-error-name.type';
+import { inputErrorMessages } from '../../constants/constants';
+import { INumberOnlyValidator } from '../../models/interfaces/number-only-validator.interface';
+import { IMonthOfPayment } from '../../models/interfaces/month-of-payment.interface';
+import { IPayment } from '../../models/interfaces/payment.interface';
 
 @Component({
   selector: 'payment-table',
@@ -30,65 +13,47 @@ interface ICheckedPayments {
 })
 export class PaymentTableComponent implements OnInit {
   public form: FormGroup;
-  private checkedPayments: ICheckedPayments = {};
   public totalSum: number = 0;
-  public inputsFieldsData: IInputFieldData[] = [
-    {
-      controlName: 'paymentName',
-      placeholder: 'Наименование платежа',
-      type: 'text',
-      validators: [
-        Validators.required,
-        CustomValidators.emptyFieldValidator.bind(this),
-      ],
-    },
-    {
-      controlName: 'costPerDay',
-      type: 'text',
-      placeholder: 'Стоимость за день',
-      validators: [
-        Validators.required,
-        Validators.min(1),
-        CustomValidators.numberOnlyValidator,
-        CustomValidators.emptyFieldValidator.bind(this),
-      ],
-    },
+  public months: IMonthOfPayment[];
+  public payments: IPayment[] = [];
+  private monthsNames: string[] = [
+    'Янв',
+    'Фев',
+    'Мар',
+    'Апр',
+    'Май',
+    'Июн',
+    'Июл',
+    'Авг',
+    'Сен',
+    'Окт',
+    'Ноя',
+    'Дек',
   ];
 
-  public months: IMonthPayment[];
-  public payments: IPayment[] = [];
-
   ngOnInit(): void {
-    this.form = Utils.getForm(this.inputsFieldsData);
+    this.form = this.getFormGroup();
     this.months = this.getMonths();
   }
 
   onSubmit(): void {
-    if (this.form.valid || !this.form.disabled) {
+    if (this.form.valid) {
       this.addPayment();
     }
   }
 
-  checkPaymentMonth(
-    event: MouseEvent,
+  getSumOfMonthlyPayment(
+    checked: boolean,
     daysNumber: number,
-    paymentId: number,
+    index: number,
     costPerDay: number
   ): void {
-    event.stopPropagation();
-    const checkbox: HTMLInputElement = event.target as HTMLInputElement;
-    let sum: number = daysNumber * costPerDay;
+    const sum: number = daysNumber * costPerDay;
 
-    if (checkbox.checked) {
-      if (!this.checkedPayments[paymentId]) {
-        this.checkedPayments[paymentId] = 0;
-      }
-      this.checkedPayments[paymentId] += sum;
+    if (checked) {
+      this.payments[index].monthsTotalSum += sum;
     } else {
-      if (!this.checkedPayments[paymentId]) {
-        this.checkedPayments[paymentId] = 0;
-      }
-      this.checkedPayments[paymentId] -= sum;
+      this.payments[index].monthsTotalSum -= sum;
     }
 
     this.getTotalSum();
@@ -96,103 +61,98 @@ export class PaymentTableComponent implements OnInit {
 
   getTotalSum(): void {
     let newSum: number = 0;
-    Object.keys(this.checkedPayments).forEach((key: string): void => {
-      newSum += this.checkedPayments[key];
+    this.payments.forEach((payment: IPayment): void => {
+      newSum += payment.monthsTotalSum;
     });
-
     this.totalSum = newSum;
   }
 
   addPayment(): void {
     const newPayment: IPayment = {
-      id: this.getPaymentId(),
       ...this.form.value,
-      checked: false,
+      monthsTotalSum: 0,
     };
+
     this.payments.push(newPayment);
   }
 
-  getPaymentId(): number {
-    if (this.payments?.length > 0) {
-      const sortPayments: IPayment[] = this.payments.sort(
-        (a: IPayment, b: IPayment): number => a.id - b.id
-      );
-      const lastPaymentId: number = sortPayments[this.payments.length - 1].id;
-
-      return lastPaymentId + 1;
-    } else {
-      return 1;
-    }
-  }
-
-  deletePayment(paymentId: number): void {
+  deletePayment(paymentIndex: number): void {
     const newPayments: IPayment[] = this.payments.filter(
-      (payment: IPayment): boolean => payment.id !== paymentId
+      (_: IPayment, index: number): boolean => index !== paymentIndex
     );
 
     this.payments = [...newPayments];
 
-    delete this.checkedPayments[paymentId];
     this.getTotalSum();
   }
 
-  setFormValue(controlValue: string, controlName: string): void {
-    if (this.form.status === 'INVALID') {
-      this.form.patchValue(
-        {
-          [controlName]: controlValue,
-        },
-        { emitEvent: true, onlySelf: false }
-      );
-    }
-  }
-
-  /*
-    We use a library moment.js to accurately determine the number of days
-    in a month from the current date, taking into account the leap year
-  */
-  getMonths(): IMonthPayment[] {
-    let months: IMonthPayment[] = [];
-    const currentMonthName: string = moment().format('MMMM');
-    const baseMonths: string[] = moment.months(currentMonthName);
-
-    let currentMonthNumber: number = baseMonths.findIndex(
-      (monthName: string): boolean => monthName === currentMonthName
-    );
-    // We apply the current locale
-    moment.locale('ru');
-
+  getMonths(): IMonthOfPayment[] {
     let monthsCount: number = 12;
+    let months: IMonthOfPayment[] = [];
+    const currentDate: Date = new Date();
+    let currentYearNumber: number = currentDate.getFullYear();
+    const currentMonthNumber: number = currentDate.getMonth();
 
     for (let i: number = currentMonthNumber; i < monthsCount; i++) {
-      const monthNameLong: string = moment().add(i, 'M').format('MMMM');
+      const daysInMonth: number = new Date(
+        currentYearNumber,
+        i + 1,
+        0
+      ).getDate();
 
-      const month: IMonthPayment = {
-        id: Number(moment().month(monthNameLong).format('M')),
-        name: moment().add(i, 'M').format('MMM').replace(/[.]/, ''),
-        /*
-          We added the next month at the method '.add()',
-          that gives us months next year if the current month, not January.
-          */
-        daysNumber: moment().add(i, 'M').daysInMonth(),
-        checked: false,
+      const month: IMonthOfPayment = {
+        id: i,
+        name: this.monthsNames[i],
+        daysNumber: daysInMonth,
       };
 
       months.push(month);
-      /*
-      This condition allows us to work with the correct month number,
-      which is necessary to find it at the "moment.js"
-      */
+
       if (i === 11) {
         i = -1;
         monthsCount = currentMonthNumber;
+        currentYearNumber += 1;
       }
     }
 
-    const sortMonths: IMonthPayment[] = months.sort(
-      (a: IMonthPayment, b: IMonthPayment): number => a.id - b.id
+    const sortMonths: IMonthOfPayment[] = months.sort(
+      (a: IMonthOfPayment, b: IMonthOfPayment): number => a.id - b.id
     );
 
     return sortMonths;
+  }
+
+  getFormGroup(): FormGroup {
+    return new FormGroup({
+      paymentName: new FormControl('', Validators.required),
+      costPerDay: new FormControl('', [
+        Validators.required,
+        Validators.min(1),
+        this.numberOnlyValidator,
+      ]),
+    });
+  }
+
+  numberOnlyValidator(control: FormControl): INumberOnlyValidator | null {
+    const letters: RegExp = new RegExp(/^[0-9]+$/, 'ig');
+    const haveLetters: number = control.value.search(letters);
+
+    if (haveLetters === -1) {
+      return {
+        numberOnlyValidator: {
+          valid: false,
+        },
+      };
+    } else {
+      return null;
+    }
+  }
+
+  getErrorMessage(errors: { [key: string]: string }): string {
+    const errorName: TInputErrorName = Object.keys(
+      errors
+    )[0] as TInputErrorName;
+
+    return inputErrorMessages[errorName];
   }
 }

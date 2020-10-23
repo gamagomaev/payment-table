@@ -15,24 +15,6 @@ body {
   box-sizing: border-box;
 }
 
-//------------- Alert styles --------------//
-
-.alert-text {
-  color: var(--accent-red);
-}
-
-.alert-border {
-  border-color: var(--accent-red);
-}
-
-//------------- Text ellipsis styles --------------//
-
-.text_ellipsis {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: pre;
-}
-
 // ---------- Scrollbar styles ---------- //
 
 ::-webkit-scrollbar-button {
