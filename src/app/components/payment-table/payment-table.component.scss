@@ -157,7 +157,7 @@
   .total-sum {
     position: sticky;
     padding: 12px 0px;
-    bottom: 0;
+    bottom: -1px;
     background-color: var(--light-01);
   }
 }
