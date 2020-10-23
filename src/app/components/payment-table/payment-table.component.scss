@@ -1,0 +1,128 @@
+:host {
+  width: 80%;
+  min-width: 680px;
+  height: 80%;
+  padding: 24px;
+  background-color: var(--light-01);
+  border-radius: 3px;
+  box-shadow: 0 0 16px 4px var(--grey-04);
+
+  .form {
+    display: flex;
+    flex-direction: row;
+    padding-bottom: 24px;
+
+    & > * {
+      &:nth-child(1) {
+        margin-right: 16px;
+      }
+      &:nth-child(1),
+      &:nth-child(2) {
+        width: 30%;
+        min-width: 120px;
+      }
+
+      &:last-child {
+        min-width: 120px;
+        margin-left: auto;
+      }
+    }
+  }
+
+  .table {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    height: calc(100% - 40px);
+    max-height: calc(100% - 40px);
+
+    &__heading {
+      position: sticky;
+      top: 0;
+      display: flex;
+      flex-direction: row;
+      background-color: var(--grey-03);
+      padding: 4px 0;
+      cursor: alias;
+
+      .month {
+        text-transform: capitalize;
+      }
+    }
+
+    &__items {
+      display: flex;
+      flex-direction: column;
+
+      .payment {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        height: 32px;
+
+        transition: all 0.2s linear;
+
+        &:nth-child(2n-2) {
+          background-color: var(--light-03);
+        }
+        &:hover {
+          background-color: var(--light-02);
+        }
+
+        .delete-btn {
+          mat-icon {
+            display: flex;
+            align-items: center;
+            width: 22px;
+            justify-content: center;
+            margin: 0 auto;
+            border-radius: 50%;
+            background-color: var(--accent-red);
+            font-size: 18px;
+            cursor: pointer;
+            font-weight: 800;
+            color: var(--label-primary);
+          }
+        }
+      }
+    }
+  }
+  .total-sum {
+    position: sticky;
+    padding: 12px 0px;
+    bottom: 0;
+    background-color: var(--light-01);
+  }
+}
+
+//----- SELECTORS -----//
+.columns_style {
+  & > * {
+    padding: 0 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre;
+    text-align: center;
+    color: var(--label-primary);
+
+    &:nth-child(1) {
+      width: 20%;
+      min-width: 100px;
+      flex-grow: 1;
+    }
+    &:nth-child(2) {
+      width: 11%;
+      min-width: 60px;
+    }
+
+    &:last-child {
+      width: 15%;
+      min-width: 80px;
+    }
+  }
+  .month {
+    width: 4.5%;
+    min-width: 32px;
+  }
+}

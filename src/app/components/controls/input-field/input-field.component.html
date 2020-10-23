@@ -1,0 +1,81 @@
+<div class="input-field" [attr.label-left]="data?.labelPosition === 'left'">
+  <ng-container *ngIf="data?.label">
+    <label
+      *ngIf="data.label"
+      class="label"
+      for="{{ data?.controlName || controlName }}"
+      [attr.label-left]="data?.labelPosition === 'left'"
+    >
+      <div class="text" title="{{ data?.label }}">
+        {{ data?.label }}
+      </div>
+    </label>
+  </ng-container>
+
+  <div
+    class="field-wrapper"
+    [attr.no-icon]="!data?.icon"
+    [attr.label-left]="data?.labelPosition === 'left'"
+  >
+    <input
+      #inputField
+      maxlength="250"
+      autocomplete="off"
+      id="{{ data?.controlName || controlName }}"
+      class="input"
+      [type]="data?.type || type"
+      [disabled]="disabled"
+      [placeholder]="
+        (translateFlag ? data?.placeholder : data?.placeholder) || ''
+      "
+      [value]="value || ''"
+      [title]="inputField.value || ''"
+      [ngClass]="{
+        invalid: !ngControl?.valid && ngControl?.touched,
+        'icon-mode': data?.icon,
+        'password-mode': data?.type === 'password',
+        additional_text: data?.additionalText,
+        'alert-border': error
+      }"
+      [ngStyle]="style"
+      (keyup)="updateValue($event, $event.target.value)"
+      (change)="sendAutofillEvent($event.target.value)"
+    />
+
+    <i *ngIf="data?.icon" class="icon {{ data?.icon }}"></i>
+    <i
+      *ngIf="data?.type === 'password'"
+      class="password-icon {{
+        inputField.type === 'password' ? 'ri-eye-off-line' : 'ri-eye-line'
+      }}"
+      (mousedown)="$event.preventDefault(); $event.stopPropagation()"
+      (click)="
+        inputField.type === 'password'
+          ? (inputField.type = 'text')
+          : (inputField.type = 'password')
+      "
+    ></i>
+    <div
+      *ngIf="data?.additionalText || additionalText"
+      class="field-wrapper__text"
+    >
+      <ng-container *ngIf="translateFlag">
+        {{ data?.additionalText || additionalText | uppercase }}
+      </ng-container>
+      <ng-container *ngIf="!translateFlag">
+        {{ data?.additionalText || additionalText | uppercase }}
+      </ng-container>
+    </div>
+    <ng-container *ngIf="ngControl?.errors">
+      <div
+        class="alert-message alert-text"
+        [ngClass]="{ show: !ngControl?.valid && ngControl?.touched }"
+        [attr.label-left]="data?.labelPosition === 'left'"
+      >
+        <span *ngIf="errorMessage">
+          {{ errorMessage }}
+        </span>
+      </div>
+    </ng-container>
+  </div>
+</div>

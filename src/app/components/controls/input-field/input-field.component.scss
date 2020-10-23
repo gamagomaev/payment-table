@@ -1,0 +1,215 @@
+:host {
+  width: 100%;
+  display: flex;
+
+  .input-field {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+
+    &[label-left="true"] {
+      flex-direction: row;
+    }
+
+    .label {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin: 0 0 8px 0;
+      width: 100%;
+      max-height: 32px;
+      font: {
+        style: normal;
+        weight: 300;
+        size: 16px;
+      }
+      text-align: left;
+      line-height: 16px;
+      color: var(--label-primary);
+
+      &[label-left="true"] {
+        width: 20%;
+        margin: 0 8px 0px 0;
+        text-align: right;
+        justify-content: flex-end;
+      }
+      .text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .field-wrapper {
+      display: flex;
+      position: relative;
+      width: 100%;
+      background-color: var(--light-01);
+      border-radius: 3px;
+
+      input[type="text"],
+      input[type="email"],
+      input[type="number"],
+      input[type="password"],
+      input[type="search"],
+      input[type="tel"],
+      input[type="time"],
+      input[type="date"] {
+        display: flex;
+        height: 24px;
+        width: 100%;
+        padding: 0 4px;
+        outline: none;
+        font: {
+          family: "Inter";
+          size: 16px;
+        }
+
+        color: var(--label-ternary);
+        background-color: var(--light-01);
+        border: 1px solid var(--grey-02);
+        border-radius: 3px;
+        caret-color: var(--accent-blue);
+        transition: all 0.1s linear;
+
+        &::placeholder {
+          color: var(--label-ternary);
+        }
+        &[placeholder] {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: pre;
+        }
+
+        &:focus:not(.invalid) {
+          border-color: var(--accent-blue);
+        }
+
+        &:hover:not(.invalid):not(:focus),
+        &:hover:not(.invalid):not(:focus) ~ i {
+          border-color: var(--accent-blue);
+          color: var(--label-secondary);
+        }
+
+        &:focus,
+        &:focus ~ i {
+          color: var(--label-primary);
+        }
+
+        &:disabled {
+          background-color: var(--disabled-24);
+          border: 0px solid var(--disabled-24);
+          color: var(--label-ternary);
+          cursor: not-allowed;
+        }
+
+        &::-ms-reveal,
+        &::-ms-clear {
+          display: none;
+        }
+        /* Это св-во для присвоения стилей через глобальные переменные,
+  для компонента InpurField т.к. IE11 переименовывает переменные глобальных стилей */
+        &[class~="invalid"],
+        &[class~="invalid"] ~ i {
+          border-color: var(--accent-red);
+          caret-color: var(--accent-red);
+          color: var(--label-primary);
+        }
+
+        & ~ i {
+          color: var(--label-ternary);
+          transition: all 0.1s linear;
+        }
+      }
+      /* Убираем стрелки из инпутов*/
+      /* Chrome, Safari, Edge, Opera */
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      /* Firefox */
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+
+      .input {
+        &:focus ~ .password-icon {
+          pointer-events: inherit;
+        }
+
+        &[class~="additional_text"] {
+          padding-right: 32px;
+        }
+      }
+
+      .icon,
+      .password-icon {
+        position: absolute;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 32px;
+      }
+
+      .icon {
+        left: 0;
+      }
+
+      .password-icon {
+        right: 0;
+        cursor: pointer;
+      }
+
+      &__text {
+        position: absolute;
+        top: calc(50% - 10px);
+        right: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 20px;
+        padding: 0 4px 0 0;
+        border-left: 1px solid var(--label-tetriary);
+
+        font: {
+          style: normal;
+          weight: 300;
+          size: 16px;
+        }
+        color: var(--label-secondary);
+      }
+
+      .alert-message {
+        position: absolute;
+        top: 100%;
+        left: 8px;
+        opacity: 0;
+        font-size: 12px;
+        transition: opacity 0.1s linear;
+
+        span {
+          white-space: nowrap;
+        }
+      }
+
+      &[label-left="true"] {
+        width: 80%;
+      }
+
+      .show {
+        opacity: 1;
+      }
+
+      .icon-mode {
+        padding-left: 24px;
+      }
+      .password-mode {
+        padding-right: 22px;
+      }
+    }
+  }
+}

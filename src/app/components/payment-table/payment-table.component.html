@@ -1,0 +1,66 @@
+<form class="form" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <input-field
+    *ngFor="let inputData of inputsFieldsData"
+    [formControlName]="inputData.controlName"
+    [data]="inputData"
+    (submitData)="setFormValue($event, inputData.controlName)"
+  ></input-field>
+  <button-comp
+    [name]="'Добавить'"
+    [disabled]="form.invalid || form.disabled"
+  ></button-comp>
+</form>
+
+<div class="table">
+  <div class="table__heading columns_style">
+    <div title="Наименование платежа">Наименование платежа</div>
+    <div title="Стоимость">Стоимость</div>
+    <div *ngFor="let month of months" class="month" title="{{ month.name }}">
+      {{ month.name }}
+    </div>
+    <div title="Удалить">Удалить</div>
+  </div>
+
+  <div class="table__items">
+    <ng-container *ngIf="payments.length > 0">
+      <ng-container *ngFor="let payment of payments">
+        <div class="payment columns_style">
+          <div class="name" title="{{ payment.paymentName }}">
+            {{ payment.paymentName }}
+          </div>
+          <div class="cost" title="{{ payment.costPerDay }}">
+            {{ payment.costPerDay }}
+          </div>
+          <ng-container *ngFor="let month of months">
+            <div class="month">
+              <input
+                type="checkbox"
+                (change)="
+                  checkPaymentMonth(
+                    $event,
+                    month.daysNumber,
+                    payment.id,
+                    payment.costPerDay
+                  )
+                "
+              />
+            </div>
+          </ng-container>
+
+          <div class="delete-btn">
+            <mat-icon
+              inline="true"
+              aria-hidden="false"
+              aria-label="Example home icon"
+              (click)="deletePayment(payment.id)"
+              >close</mat-icon
+            >
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+  <div class="total-sum">
+    Израсходовано средств: <b>{{ totalSum }}</b>
+  </div>
+</div>
