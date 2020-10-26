@@ -50,11 +50,9 @@ export class PaymentTableComponent implements OnInit {
   ): void {
     const sum: number = daysNumber * costPerDay;
 
-    if (checked) {
-      this.payments[index].monthsTotalSum += sum;
-    } else {
-      this.payments[index].monthsTotalSum -= sum;
-    }
+    checked
+      ? (this.payments[index].monthsTotalSum += sum)
+      : (this.payments[index].monthsTotalSum -= sum);
 
     this.getTotalSum();
   }
